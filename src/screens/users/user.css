@@ -1,0 +1,112 @@
+.headeritem {
+  font-size: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.itemListEdit {
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  background-color: #3bb077;
+  color: white;
+  cursor: pointer;
+  margin-right: 15px;
+}
+.addButton {
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  background-color: #3bb077;
+  color: white;
+  cursor: pointer;
+  /* margin-right: 20px; */
+  height: 4rem;
+}
+.adlButton {
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  background-color: #3bb077;
+  color: white;
+  cursor: pointer;
+  margin-left: 10px;
+  height: 4rem;
+}
+.itemListDelete {
+  color: red;
+  cursor: pointer;
+}
+.rowitem {
+  font-size: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+.description {
+  /* display: flex; */
+  border-radius: 0.5rem;
+  border: 0.1rem var(--color-border) solid;
+  margin: 2rem;
+  width: 50%;
+  background-color: var(--color-border);
+  justify-content: space-around;
+  align-items: center;
+}
+.pricing {
+  /* display: flex; */
+  border-radius: 0.5rem;
+  border: 0.1rem var(--color-border) solid;
+  margin: 2rem;
+  width: 50rem;
+  background-color: var(--color-border);
+  justify-content: space-around;
+  align-items: center;
+}
+.stock {
+  /* display: flex; */
+  border-radius: 0.5rem;
+  border: 0.1rem var(--color-border) solid;
+  margin: 2rem;
+  width: 50rem;
+  background-color: var(--color-border);
+  justify-content: space-around;
+  align-items: center;
+}
+.container {
+  display: flex;
+  border-radius: 0.5rem;
+  border: 0.1rem var(--color-border) solid;
+  padding: 1rem;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+}
+.formProduct {
+  margin: 0 auto;
+  display: flex;
+  width: 100%;
+}
+.description.pricing > div {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+}
+.formProduct > input[type="number"] {
+  width: 20rem;
+}
+.inputForm {
+  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+input[type="number"] {
+  width: 30rem;
+}
+.selectCategory {
+  margin-left: 1rem;
+  width: 30rem;
+
+}
+.labelCategory {
+  margin-right: 1rem;
+}

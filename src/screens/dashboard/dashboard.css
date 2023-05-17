@@ -1,0 +1,9 @@
+.filterItems{
+    width: 80%;
+    padding: 1rem;
+}
+.content {
+         justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }

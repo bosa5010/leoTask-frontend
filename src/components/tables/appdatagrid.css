@@ -1,0 +1,13 @@
+.headeritem {
+  font-size: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.rowitem {
+  font-size: 1.5rem;
+}
+.RowClassName {
+  align-items: center;
+  justify-content: center;
+}
