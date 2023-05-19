@@ -993,7 +993,7 @@ export default function SubTaskEditScreen(props) {
                           closeMenuOnSelect={true}
                           instruction={onChangeStep}
                           options={steps && steps}
-                          isDisabled={false}
+                          isDisabled={true}
                           required={true}
                           isMulti={false}
                           isSearchable
