@@ -83,7 +83,7 @@ const FORM_VALIDATION = Yup.object().shape({
 });
 
 function lastweek() {
-  var lastweek = moment(new Date()).startOf("week").format("YYYY-MM-DD");
+  var lastweek = moment().startOf("week").format("YYYY-MM-DD");
 
   return lastweek;
 }
