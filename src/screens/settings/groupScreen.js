@@ -1,83 +1,70 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { deleteGroup, listGroups } from "../../redux/actions/groupActions";
 import {
-  deleteItemStatus,
-  listItemStatuss,
-} from "../../redux/actions/itemStatusActions";
-import {
-  ITEMSTATUS_CREATE_RESET,
-  ITEMSTATUS_DELETE_RESET,
-  ITEMSTATUS_UPDATE_RESET,
-} from "../../redux/constants/itemStatusConstants";
+  GROUP_CREATE_RESET,
+  GROUP_DELETE_RESET,
+  GROUP_UPDATE_RESET,
+} from "../../redux/constants/groupConstants";
 import AppDataGrid from "../../components/tables/AppDataGrid";
+
 import { ActionStatus } from "../../components/ActionStatus";
 
-export default function ItemStatusScreen(props) {
-  const itemStatusList = useSelector((state) => state.itemStatusList);
-  const { loading, error, pages, itemStatuss, pageNumber, pageSize } =
-    itemStatusList;
+export default function GroupScreen(props) {
+  const groupList = useSelector((state) => state.groupList);
+  const { loading, error, pages, groups, pageNumber, pageSize } = groupList;
 
-  const itemStatusCreate = useSelector((state) => state.itemStatusCreate);
+  const groupCreate = useSelector((state) => state.groupCreate);
   const {
     loading: loadingCreate,
     error: errorCreate,
     success: successCreate,
-  } = itemStatusCreate;
+  } = groupCreate;
 
-  const itemStatusUpdate = useSelector((state) => state.itemStatusUpdate);
+  const groupUpdate = useSelector((state) => state.groupUpdate);
   const {
     loading: loadingUpdate,
     error: errorUpdate,
-    success: successUpdated,
-  } = itemStatusUpdate;
+    success: successUpdate,
+  } = groupUpdate;
 
-  const itemStatusDelete = useSelector((state) => state.itemStatusDelete);
+  const groupDelete = useSelector((state) => state.groupDelete);
   const {
     loading: loadingDelete,
     success: successDelete,
     error: errorDelete,
-  } = itemStatusDelete;
+  } = groupDelete;
 
   const dispatch = useDispatch();
   useEffect(() => {
     if (successCreate) {
       setTimeout(function () {
-        dispatch({ type: ITEMSTATUS_CREATE_RESET });
+        dispatch({ type: GROUP_CREATE_RESET });
       }, 2000);
     }
 
-    if (successUpdated) {
+    if (successUpdate) {
       setTimeout(function () {
-        dispatch({ type: ITEMSTATUS_UPDATE_RESET });
+        dispatch({ type: GROUP_UPDATE_RESET });
       }, 2000);
     }
-    if (!successCreate && !successDelete && !successUpdated) {
-      dispatch(listItemStatuss({ name: "", pageNumber: 1, pageSize: 15 }));
+    if (!successCreate && !successDelete && !successUpdate) {
+      dispatch(listGroups({ name: "", pageNumber: 1, pageSize: 15 }));
     }
-  }, [dispatch, successCreate, successUpdated, successDelete]);
+  }, [dispatch, successCreate, successUpdate, successDelete]);
 
   useEffect(() => {
     if (successDelete) {
       setTimeout(function () {
-        dispatch({ type: ITEMSTATUS_DELETE_RESET });
+        dispatch({ type: GROUP_DELETE_RESET });
       }, 2000);
     }
   }, [dispatch, successDelete]);
 
-  const deleteHandler = (itemStatusId) => {
-    if (window.confirm("Are you sure to delete")) {
-      dispatch(deleteItemStatus(itemStatusId));
-    }
-  };
-
-  const updateHandler = (weekId) => {
-    props.history.push(`/itemstatus/${weekId}/edit`);
-  };
-
   const searchHandler = (e) => {
     dispatch(
-      listItemStatuss({
+      listGroups({
         name: e.target.value,
         pageNumber: 1,
         pageSize: 15,
@@ -85,7 +72,17 @@ export default function ItemStatusScreen(props) {
     );
   };
 
-  const itemStatussHeadCells = [
+  const deleteHandler = (groupId) => {
+    if (window.confirm("Are you sure to delete")) {
+      dispatch(deleteGroup(groupId));
+    }
+  };
+
+  const updateHandler = (instanceId) => {
+    props.history.push(`/group/${instanceId}/edit`);
+  };
+
+  const groupsHeadCells = [
     // {
     //   field: "_id",
     //   headerName: "id",
@@ -94,24 +91,27 @@ export default function ItemStatusScreen(props) {
     // },
     {
       field: "name",
-      headerName: "Name",
+      headerName: "NAME",
       flex: 1,
       type: "string",
       headerClassName: "headeritem",
     },
     {
       field: "description",
-      headerName: "Description",
+      headerName: "DESCRIPTION",
       flex: 1,
       type: "string",
       headerClassName: "headeritem",
     },
     {
-      field: "reference",
-      headerName: "Reference",
+      field: "team",
+      headerName: "TEAM",
       flex: 1,
-      type: "string",
       headerClassName: "headeritem",
+      renderCell: (params) => (
+        <div className="cellItems">{params.row?.team?.name}</div>
+      ),
+      type: "string",
     },
   ];
 
@@ -119,14 +119,14 @@ export default function ItemStatusScreen(props) {
     <div>
       <div className="row">
         <div className="row">
-          <h1>Item Status : </h1>
+          <h1>Groups : </h1>
           <input
             type="search"
-            id="itemStatus"
+            id="group"
             onChange={(e) => {
               searchHandler(e);
             }}
-            placeholder="Name Item Status"
+            placeholder="Group Name "
             autoComplete="off"
           />
         </div>
@@ -134,10 +134,10 @@ export default function ItemStatusScreen(props) {
           type="button"
           className="adlButton row"
           onClick={() => {
-            props.history && props.history.push(`/itemstatus/${null}/edit`);
+            props.history && props.history.push(`/group/${null}/edit`);
           }}
         >
-          Add Item Status
+          Add Group
         </button>
       </div>
 
@@ -145,26 +145,24 @@ export default function ItemStatusScreen(props) {
         loading={loadingCreate}
         error={errorCreate}
         success={successCreate}
-        message={"Item Status Added Successfully"}
+        message={"User Created Successfuly"}
       />
-
       <ActionStatus
         loading={loadingUpdate}
         error={errorUpdate}
-        success={successUpdated}
-        message={"Item Status Updated Successfully"}
+        success={successUpdate}
+        message={"User Updated Successfuly"}
       />
-
       <ActionStatus
         loading={loadingDelete}
         error={errorDelete}
         success={successDelete}
-        message={"Item Status Deleted Successfully"}
+        message={"User Deleted Successfuly"}
       />
 
       <AppDataGrid
-        columns={itemStatussHeadCells}
-        tableRows={itemStatuss}
+        columns={groupsHeadCells}
+        tableRows={groups}
         page={pageNumber - 1}
         pageSize={Number(pageSize)}
         rowCount={Number(pages)}
@@ -172,7 +170,7 @@ export default function ItemStatusScreen(props) {
         error={error}
         onPageChange={(data) => {
           dispatch(
-            listItemStatuss({
+            listGroups({
               pageNumber: data + 1,
               pageSize: pageSize,
             })
@@ -180,7 +178,7 @@ export default function ItemStatusScreen(props) {
         }}
         onPageSizeChange={(data) => {
           dispatch(
-            listItemStatuss({
+            listGroups({
               pageNumber: data < pages ? pageNumber : 1,
               pageSize: data,
             })

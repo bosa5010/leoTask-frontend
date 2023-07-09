@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { frozenListTaskModels } from "../../redux/actions/taskModelActions";
 import { frozenListTaskThemes } from "../../redux/actions/taskThemeActions";
+import { objectId } from "../../utils";
 
 const SideBar = ({ props }) => {
   const iconSize = 15;
@@ -36,9 +37,27 @@ const SideBar = ({ props }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(frozenListTaskModels({ pageNumber: 1, pageSize: 50 }));
-    dispatch(frozenListTaskThemes({ pageNumber: 1, pageSize: 50 }));
-  }, [dispatch]);
+    if (userInfo) {
+      dispatch(
+        frozenListTaskThemes({
+          pageNumber: 1,
+          pageSize: 50,
+          teams:
+            userInfo?.managedTeams.length > 0
+              ? objectId(userInfo?.managedTeams)
+              : userInfo?.team?._id,
+        })
+      );
+
+      dispatch(
+        frozenListTaskModels({
+          pageNumber: 1,
+          pageSize: 50,
+          groups: objectId(userInfo?.groups),
+        })
+      );
+    }
+  }, [userInfo, dispatch]);
 
   const myRef = useRef();
 
@@ -132,56 +151,63 @@ const SideBar = ({ props }) => {
             ))}
         </Menu>
         <Menu iconShape="circle">
-          <MenuItem icon={<MdAddTask size={iconSize} />}>
-            <Link to="/tasklist">Tasks</Link>
-          </MenuItem>
+          {userInfo?.isAdmin && (
+            <MenuItem icon={<MdAddTask size={iconSize} />}>
+              <Link to="/tasklist">Tasks</Link>
+            </MenuItem>
+          )}
           <MenuItem icon={<TbSubtask size={iconSize} />}>
             <Link to="/subtasklist">Tasks Feedback</Link>
           </MenuItem>
         </Menu>
-        <Menu iconShape="circle">
-          <SubMenu
-            title={"Parametres"}
-            icon={<AiTwotoneSetting size={iconSize} />}
-          >
-            <MenuItem>
-              <Link to="/calenderlist">Calender</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/instancelist">Instance</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/itemlist">Item</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/itemStatuslist">Item Status</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/statuslist">Status</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/systemlist">Systems</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/taskmodelist">Task Model</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/steplist">Task Model Steps</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/taskthemelist">Task Theme</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/teamlist">Teams</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/userlist">Users</Link>
-            </MenuItem>
-            <MenuItem>
-              <Link to="/weeklist">Week</Link>
-            </MenuItem>
-          </SubMenu>
-        </Menu>
+        {userInfo?.isAdmin && (
+          <Menu iconShape="circle">
+            <SubMenu
+              title={"Parametres"}
+              icon={<AiTwotoneSetting size={iconSize} />}
+            >
+              <MenuItem>
+                <Link to="/calenderlist">Calender</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/instancelist">Instance</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/itemlist">Item</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/itemStatuslist">Item Status</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/statuslist">Status</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/systemlist">Systems</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/taskmodelist">Task Model</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/steplist">Task Model Steps</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/taskthemelist">Task Theme</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/teamlist">Teams</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/grouplist">Groups</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/userlist">Users</Link>
+              </MenuItem>
+              <MenuItem>
+                <Link to="/weeklist">Week</Link>
+              </MenuItem>
+            </SubMenu>
+          </Menu>
+        )}
       </SidebarContent>
 
       <SidebarFooter style={{ textAlign: "center" }}>

@@ -133,6 +133,7 @@ export const listUsers =
     name = "",
     firstName = "",
     lastName = "",
+    groups = "",
   }) =>
   async (dispatch, getState) => {
     dispatch({ type: userActions.USER_LIST_REQUEST });
@@ -141,7 +142,7 @@ export const listUsers =
     } = getState();
     try {
       const { data } = await axios.get(
-        `${url}/api/users?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&firstName=${firstName}&lastName=${lastName}`,
+        `${url}/api/users?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&firstName=${firstName}&lastName=${lastName}&groups=${groups}`,
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }

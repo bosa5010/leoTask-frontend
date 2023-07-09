@@ -29,7 +29,7 @@ export const listTaskThemes =
   };
 
 export const frozenListTaskThemes =
-  ({ name = "", pageNumber = "", pageSize = "" }) =>
+  ({ name = "", pageNumber = "", pageSize = "", teams }) =>
   async (dispatch, getState) => {
     dispatch({
       type: taskThemeActions.TASKTHEME_FROZEN_LIST_REQUEST,
@@ -39,7 +39,7 @@ export const frozenListTaskThemes =
     } = getState();
     try {
       const { data } = await axios.get(
-        `${url}/api/taskThemes?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}`,
+        `${url}/api/taskThemes?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&teams=${teams}`,
         { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       dispatch({
@@ -54,13 +54,18 @@ export const frozenListTaskThemes =
     }
   };
 
-export const detailsTaskTheme = (taskThemeId) => async (dispatch) => {
+export const detailsTaskTheme = (taskThemeId) => async (dispatch, getState) => {
   dispatch({
     type: taskThemeActions.TASKTHEME_DETAILS_REQUEST,
     payload: taskThemeId,
   });
+  const {
+    userSignin: { userInfo },
+  } = getState();
   try {
-    const { data } = await axios.get(`${url}/api/taskThemes/${taskThemeId}`);
+    const { data } = await axios.get(`${url}/api/taskThemes/${taskThemeId}`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    });
     dispatch({
       type: taskThemeActions.TASKTHEME_DETAILS_SUCCESS,
       payload: data,

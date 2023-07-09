@@ -31,6 +31,8 @@ import { listTaskThemes } from "../../redux/actions/taskThemeActions";
 import { listSteps } from "../../redux/actions/stepActions";
 import TextAreaForm from "../../components/FormsUI/TextArea/TextAreaForm";
 import { listSystems } from "../../redux/actions/systemActions";
+import { listGroups } from "../../redux/actions/groupActions";
+import { objectId } from "../../utils";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -64,6 +66,7 @@ const FORM_VALIDATION = Yup.object().shape({
   name: Yup.string().required("Please Enter Name"),
   description: Yup.string().required("Please Enter Description"),
   taskTheme: Yup.object().required("Please Select Task Theme"),
+  groups: Yup.array().required("Please Select Groups"),
   steps: Yup.array().required("Please Select Steps"),
   systems: Yup.array().required("Please Select Systems"),
 });
@@ -75,11 +78,13 @@ export default function TaskModelEditScreen(props) {
       : null;
 
   const [open, setOpen] = React.useState(false);
+  const [selectedTeam, setSelectedTeam] = useState("");
 
   const [initialValues, setInitialValues] = useState({
     name: "",
     description: "",
     taskTheme: "",
+    groups: "",
     steps: "",
     systems: "",
   });
@@ -95,6 +100,9 @@ export default function TaskModelEditScreen(props) {
 
   const stepList = useSelector((state) => state.stepList);
   const { loading: loadingSteps, error: errorSteps, steps } = stepList;
+
+  const groupList = useSelector((state) => state.groupList);
+  const { loading: loadingGroup, error: errorGroup, groups } = groupList;
 
   const systemList = useSelector((state) => state.systemList);
   const { loading: loadingSystems, error: errorSystems, systems } = systemList;
@@ -148,9 +156,11 @@ export default function TaskModelEditScreen(props) {
         name: taskModel ? taskModel.name : "",
         description: taskModel ? taskModel.description : "",
         taskTheme: taskModel ? taskModel.taskTheme : "",
+        groups: taskModel ? taskModel.groups : "",
         steps: taskModel ? taskModel.steps : "",
         systems: taskModel ? taskModel.systems : "",
       });
+      setSelectedTeam(taskModel.taskThem);
     }
   }, [taskModel, dispatch, taskModelId, successUpdate, props.history]);
 
@@ -191,10 +201,37 @@ export default function TaskModelEditScreen(props) {
       );
   };
 
+  const onChangeTaskTheme = (setFieldValue, values, value, object) => {
+    setFieldValue("groups", "");
+  };
+
+  useEffect(() => {
+    dispatch(
+      listGroups({
+        name: "",
+        pageNumber: 1,
+        pageSize: 15,
+        team: objectId(selectedTeam?.teams),
+      })
+    );
+  }, [dispatch, selectedTeam]);
+
+  const handleInputChangeGroup = (e) => {
+    e !== "" &&
+      dispatch(
+        listGroups({
+          name: e,
+          pageNumber: 1,
+          pageSize: 15,
+          team: objectId(selectedTeam.teams),
+        })
+      );
+  };
+
   return (
     <Grid container>
       <Grid item xs={12}>
-        <Container maxWidth="sm">
+        <Container maxWidth="md">
           <div className={classes.formWrapper}>
             <Formik
               enableReinitialize
@@ -251,9 +288,11 @@ export default function TaskModelEditScreen(props) {
                       <div>
                         <ReactSelectForm
                           closeMenuOnSelect={true}
+                          setSelectedOptions={setSelectedTeam}
                           onInputChange={(e) => {
                             handleInputChange(e, listTaskThemes);
                           }}
+                          instruction={onChangeTaskTheme}
                           options={taskThemes}
                           required={true}
                           isMulti={false}
@@ -262,6 +301,23 @@ export default function TaskModelEditScreen(props) {
                           loading={loadingTaskTheme}
                           error={errorTaskTheme}
                           label={"Task Themes"}
+                        />
+                      </div>
+                    </Grid>
+                    <Grid item xs={9} className={classes.formField}>
+                      <div>
+                        <ReactSelectForm
+                          closeMenuOnSelect={true}
+                          onInputChange={handleInputChangeGroup}
+                          options={groups}
+                          required={true}
+                          isMulti={true}
+                          isDisabled={selectedTeam === ""}
+                          isSearchable
+                          name="groups"
+                          loading={loadingGroup}
+                          error={errorGroup}
+                          label={"Groups"}
                         />
                       </div>
                     </Grid>

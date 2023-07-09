@@ -3,7 +3,7 @@ import { url } from "../api/index";
 import * as instanceActions from "../constants/instanceConstants";
 
 export const listInstances =
-  ({ name = "", pageNumber = "", pageSize = "", system = "" }) =>
+  ({ name = "", pageNumber = "", pageSize = "", system = "", systems = "" }) =>
   async (dispatch, getState) => {
     dispatch({
       type: instanceActions.INSTANCE_LIST_REQUEST,
@@ -13,7 +13,7 @@ export const listInstances =
     } = getState();
     try {
       const { data } = await axios.get(
-        `${url}/api/instances?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&system=${system}`,
+        `${url}/api/instances?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&system=${system}&systems=${systems}`,
         { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       dispatch({

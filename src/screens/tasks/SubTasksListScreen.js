@@ -7,18 +7,17 @@ import { listSubTasks } from "../../redux/actions/subTaskActions";
 import AppDataGrid from "../../components/tables/AppDataGrid";
 import moment from "../../../node_modules/moment/moment";
 import SubTaskFilter from "./SubTaskFilter";
+import { objectId } from "../../utils";
 
 export default function SubTaskListScreen(props) {
   const [filter, setFilter] = useState(false);
-  const [listOfSystems, setListSystems] = useState();
-  const [listTaskModel, setLisTaskModel] = useState();
-  const [listInstance, setListInstance] = useState();
-  const [listOfTasks, setListOfTasks] = useState();
-  const [listItem, setListItem] = useState();
-  const [listItemStatus, setListItemStatus] = useState();
-  const [listUser, setListUsers] = useState();
-  const [firstDate, setFirstDate] = useState();
-  const [lastDate, setLastDate] = useState();
+  const [listOfSystems, setListSystems] = useState("");
+  const [listTaskModel, setLisTaskModel] = useState("");
+  const [listInstance, setListInstance] = useState("");
+  const [listItem, setListItem] = useState("");
+  const [listItemStatus, setListItemStatus] = useState("");
+  const [firstDate, setFirstDate] = useState("");
+  const [lastDate, setLastDate] = useState("");
 
   const subTaskList = useSelector((state) => state.subTaskList);
   const { loading, error, subTasks, pages, pageNumber, pageSize } = subTaskList;
@@ -30,13 +29,11 @@ export default function SubTaskListScreen(props) {
       let tempObject = {
         pageNumber,
         pageSize,
-        taskModels: objectId(listTaskModel),
-        users: objectId(listUser),
+        taskModels: listTaskModel?._id,
         systems: objectId(listOfSystems),
         instance: objectId(listInstance),
         items: objectId(listItem),
         itemStatus: objectId(listItemStatus),
-        tasks: objectId(listOfTasks),
         firstDate: firstDate,
         lastDate: lastDate,
         taskStep: "null",
@@ -50,8 +47,6 @@ export default function SubTaskListScreen(props) {
       dispatch,
       listTaskModel,
       listOfSystems,
-      listOfTasks,
-      listUser,
       listInstance,
       listItem,
       listItemStatus,
@@ -63,14 +58,6 @@ export default function SubTaskListScreen(props) {
   useEffect(() => {
     dispatchSubTaskList(1, 15);
   }, [dispatchSubTaskList]);
-
-  const objectId = (objects) => {
-    if (objects) {
-      const tempObjects = objects.map(({ _id }) => _id);
-      return tempObjects;
-    }
-    return [];
-  };
 
   const subTasksHeadCells = [
     // {
@@ -196,15 +183,11 @@ export default function SubTaskListScreen(props) {
         listTaskModel={listTaskModel}
         setLisTaskModel={setLisTaskModel}
         listInstance={listInstance}
-        listOfTasks={listOfTasks}
-        setListOfTasks={setListOfTasks}
         setListInstance={setListInstance}
         listItem={listItem}
         setListItem={setListItem}
         listItemStatus={listItemStatus}
         setListItemStatus={setListItemStatus}
-        listUser={listUser}
-        setListUsers={setListUsers}
         firstDate={firstDate}
         setFirstDate={setFirstDate}
         lastDate={lastDate}

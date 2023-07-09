@@ -28,27 +28,34 @@ export const listItemStatuss =
     }
   };
 
-export const detailsItemStatus = (itemStatusId) => async (dispatch) => {
-  dispatch({
-    type: itemStatusActions.ITEMSTATUS_DETAILS_REQUEST,
-    payload: itemStatusId,
-  });
-  try {
-    const { data } = await axios.get(`${url}/api/itemStatus/${itemStatusId}`);
+export const detailsItemStatus =
+  (itemStatusId) => async (dispatch, getState) => {
     dispatch({
-      type: itemStatusActions.ITEMSTATUS_DETAILS_SUCCESS,
-      payload: data,
+      type: itemStatusActions.ITEMSTATUS_DETAILS_REQUEST,
+      payload: itemStatusId,
     });
-  } catch (error) {
-    dispatch({
-      type: itemStatusActions.ITEMSTATUS_DETAILS_FAIL,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
-    });
-  }
-};
+    const {
+      userSignin: { userInfo },
+    } = getState();
+    try {
+      const { data } = await axios.get(
+        `${url}/api/itemStatus/${itemStatusId}`,
+        { headers: { Authorization: `Bearer ${userInfo.token}` } }
+      );
+      dispatch({
+        type: itemStatusActions.ITEMSTATUS_DETAILS_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: itemStatusActions.ITEMSTATUS_DETAILS_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
 
 export const createItemStatus = (itemStatus) => async (dispatch, getState) => {
   dispatch({

@@ -4,6 +4,7 @@ import thunk from "redux-thunk";
 import * as systemReducers from "./reducers/systemReducers";
 import * as userReducers from "./reducers/userReducers";
 import * as teamReducers from "./reducers/teamReducers";
+import * as groupReducers from "./reducers/groupReducers";
 import * as taskThemeReducers from "./reducers/taskThemeReducers";
 import * as taskModelReducers from "./reducers/taskModelReducers";
 import * as instanceReducers from "./reducers/instanceReducers";
@@ -88,6 +89,12 @@ const reducer = combineReducers({
   teamCreate: teamReducers.teamCreateReducer,
   teamUpdate: teamReducers.teamUpdateReducer,
   teamDelete: teamReducers.teamDeleteReducer,
+
+  groupList: groupReducers.groupListReducer,
+  groupDetails: groupReducers.groupDetailsReducer,
+  groupCreate: groupReducers.groupCreateReducer,
+  groupUpdate: groupReducers.groupUpdateReducer,
+  groupDelete: groupReducers.groupDeleteReducer,
 
   taskThemeList: taskThemeReducers.taskThemeListReducer,
   taskThemeFrozenList: taskThemeReducers.taskThemeListFrozenReducer,

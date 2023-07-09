@@ -8,7 +8,10 @@ export const listTasks =
     pageNumber = "",
     pageSize = "",
     taskModels = "",
+    groups = "",
+    teams = "",
     status = "",
+    activeStatus = "",
     reference = "",
     users = "",
     instance = "",
@@ -24,7 +27,7 @@ export const listTasks =
     } = getState();
     try {
       const { data } = await axios.get(
-        `${url}/api/tasks?pageNumber=${pageNumber}&pageSize=${pageSize}&description=${description}&taskModels=${taskModels}&reference=${reference}&status=${status}&users=${users}&instance=${instance}&lastDate=${lastDate}&firstDate=${firstDate}`,
+        `${url}/api/tasks?pageNumber=${pageNumber}&pageSize=${pageSize}&description=${description}&taskModels=${taskModels}&reference=${reference}&status=${status}&users=${users}&instance=${instance}&lastDate=${lastDate}&firstDate=${firstDate}&groups=${groups}&teams=${teams}&activeStatus=${activeStatus}`,
         { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       dispatch({

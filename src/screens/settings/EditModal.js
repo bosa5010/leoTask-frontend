@@ -39,7 +39,6 @@ export default function EditModal({
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log("extraField", name, extraField);
     onSubmit && onSubmit(name, description, extraField);
     setTimeout(function () {
       setName("");

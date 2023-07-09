@@ -46,6 +46,7 @@ export default function AppModal({
         <div style={modalStyle} className={(classes.paper, "appModal")}>
           <button
             className="itemListEdit"
+            style={{ right: 0, position: "absolute" }}
             onClick={() => {
               handleClose();
               setOpen(false);

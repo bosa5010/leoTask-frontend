@@ -81,7 +81,6 @@ export default function StatusScreen(props) {
   };
 
   const createHandler = (name, description, number) => {
-    console.log("name, description, number", name, description, number);
     dispatch(
       createStatus({
         name: name,

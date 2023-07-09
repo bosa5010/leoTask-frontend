@@ -35,6 +35,10 @@ import WeekEditScreen from "./screens/settings/WeekEditScreen";
 import CalenderEditScreen from "./screens/settings/CalenderEditScreen";
 import TasksEditScreen from "./screens/tasks/TasksEditScreen";
 import WeeksEditScreen from "./screens/settings/WeeksEditScreen";
+import GroupScreen from "./screens/settings/groupScreen";
+import GroupEditScreen from "./screens/settings/groupEditScreen";
+import TaskThemeEditScreen from "./screens/settings/taskThemeEditScreen";
+import ItemStatusEditScreen from "./screens/settings/ItemStatusEditScreen";
 
 function App(props) {
   return (
@@ -52,11 +56,7 @@ function App(props) {
               {/* User Routes */}
               <Route path="/signin" component={SigninScreen} exact />
 
-              <PrivateRoute
-                path="/taskslist"
-                component={TasksListScreen}
-                exact
-              />
+              <PrivateRoute path="/" component={TasksListScreen} exact />
               <PrivateRoute
                 path="/taskslist/:reference"
                 component={TasksListScreen}
@@ -72,7 +72,6 @@ function App(props) {
                 component={TasksListScreen}
                 exact
               />
-              <PrivateRoute path="/" component={TasksListScreen} exact />
               <PrivateRoute
                 path="/taskcreate"
                 component={TaskEditScreen}
@@ -97,6 +96,11 @@ function App(props) {
               <PrivateRoute
                 path="/subtasklist"
                 component={SubTasksListScreen}
+                exact
+              />
+              <PrivateRoute
+                path="/dashboard"
+                component={DashboardScreen}
                 exact
               />
 
@@ -138,37 +142,7 @@ function App(props) {
                 component={StepScreen}
                 exact
               />
-              <AdminRoute path="/itemlist" component={ItemScreen} exact />
-              <AdminRoute
-                path="/itemlist/pageNumber/:pageNumber/pageSize/:pageSize"
-                component={ItemScreen}
-                exact
-              />
-              <AdminRoute
-                path="/item/:id/edit"
-                component={ItemEditScreen}
-                exact
-              />
-              <AdminRoute
-                path="/itemStatuslist"
-                component={ItemStatusScreen}
-                exact
-              />
-              <AdminRoute
-                path="/itemStatuslist/pageNumber/:pageNumber/pageSize/:pageSize"
-                component={ItemStatusScreen}
-                exact
-              />
-              <AdminRoute
-                path="/taskthemelist"
-                component={TaskThemeScreen}
-                exact
-              />
-              <AdminRoute
-                path="/taskthemelist/pageNumber/:pageNumber/pageSize/:pageSize"
-                component={TaskThemeScreen}
-                exact
-              />
+
               <AdminRoute
                 path="/taskmodelist/pageNumber/:pageNumber/pageSize/:pageSize"
                 component={TaskModelScreen}
@@ -214,6 +188,16 @@ function App(props) {
                 exact
               />
               <SuperAdminRoute
+                path="/grouplist"
+                component={GroupScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/group/:id/edit"
+                component={GroupEditScreen}
+                exact
+              />
+              <SuperAdminRoute
                 path="/systemlist/pageNumber/:pageNumber/pageSize/:pageSize"
                 component={SystemScreen}
                 exact
@@ -239,6 +223,7 @@ function App(props) {
                 component={InstanceEditScreen}
                 exact
               />
+
               <SuperAdminRoute
                 path="/statuslist/pageNumber/:pageNumber/pageSize/:pageSize"
                 component={StatusScreen}
@@ -263,9 +248,45 @@ function App(props) {
                 component={WeeksEditScreen}
               />
               <SuperAdminRoute path="/weeklist" component={WeekScreen} exact />
+              <SuperAdminRoute path="/itemlist" component={ItemScreen} exact />
               <SuperAdminRoute
-                path="/dashboard"
-                component={DashboardScreen}
+                path="/itemlist/pageNumber/:pageNumber/pageSize/:pageSize"
+                component={ItemScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/item/:id/edit"
+                component={ItemEditScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/itemstatus/:id/edit"
+                component={ItemStatusEditScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/itemStatuslist"
+                component={ItemStatusScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/itemStatuslist/pageNumber/:pageNumber/pageSize/:pageSize"
+                component={ItemStatusScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/taskthemelist"
+                component={TaskThemeScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/taskthemelist/pageNumber/:pageNumber/pageSize/:pageSize"
+                component={TaskThemeScreen}
+                exact
+              />
+              <SuperAdminRoute
+                path="/tasktheme/:id/edit"
+                component={TaskThemeEditScreen}
                 exact
               />
             </div>

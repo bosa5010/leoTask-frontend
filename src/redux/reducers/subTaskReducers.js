@@ -40,7 +40,12 @@ export const subTaskCreateReducer = (state = {}, action) => {
     case subTaskActions.SUBTASK_CREATE_REQUEST:
       return { loading: true };
     case subTaskActions.SUBTASK_CREATE_SUCCESS:
-      return { loading: false, success: true, subTask: action.payload };
+      return {
+        loading: false,
+        success: true,
+        subTask: action.payload.subTask,
+        message: action.payload.message,
+      };
     case subTaskActions.SUBTASK_CREATE_FAIL:
       return { loading: false, error: action.payload };
     case subTaskActions.SUBTASK_CREATE_RESET:

@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { signin } from "../../redux/actions/userActions";
 import LoadingBox from "../../components/LoadingBox";
 import MessageBox from "../../components/MessageBox";
-import { frozenListTaskModels } from "../../redux/actions/taskModelActions";
-import { frozenListTaskThemes } from "../../redux/actions/taskThemeActions";
 
 export default function SigninScreen(props) {
   const [email, setEmail] = useState("");
@@ -25,10 +23,8 @@ export default function SigninScreen(props) {
 
   useEffect(() => {
     if (userInfo) {
-      dispatch(frozenListTaskModels({ pageNumber: 1, pageSize: 50 }));
-      dispatch(frozenListTaskThemes({ pageNumber: 1, pageSize: 50 }));
-
       props.history.push(redirect);
+      window.location.reload();
     }
   }, [props.history, redirect, userInfo, dispatch]);
 

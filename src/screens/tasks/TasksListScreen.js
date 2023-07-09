@@ -9,6 +9,7 @@ import AppDataGrid from "../../components/tables/AppDataGrid";
 import moment from "../../../node_modules/moment/moment";
 import { makeStyles } from "@material-ui/core/styles";
 import TaskFilter from "./TaskFilter";
+import { objectId } from "../../utils";
 
 const useStyles = makeStyles({
   root: {
@@ -57,6 +58,7 @@ export default function TasksListScreen(props) {
   const [listStatus, setListStatus] = useState();
   const [activeStatus, setActiveStatus] = useState();
   const [listTaskModel, setLisTaskModel] = useState();
+  const [listGroup, setListGroups] = useState("");
   const [listInstance, setListInstance] = useState();
   const [listUser, setListUsers] = useState();
   const [firstDate, setFirstDate] = useState();
@@ -67,6 +69,9 @@ export default function TasksListScreen(props) {
   const taskList = useSelector((state) => state.taskList);
   const { loading, error, tasks, pages, pageNumber, pageSize } = taskList;
 
+  const userSignin = useSelector((state) => state.userSignin);
+  const { userInfo: myUserInfo } = userSignin;
+
   const dispatch = useDispatch();
 
   const dispatchTaskList = useCallback(
@@ -75,11 +80,15 @@ export default function TasksListScreen(props) {
         pageNumber,
         pageSize,
         taskModels:
-          listTaskModel && listTaskModel.length > 0
-            ? objectId(listTaskModel)
-            : taskModelId,
+          listTaskModel?.length > 0 ? objectId(listTaskModel) : taskModelId,
         users: listUser && listUser.length > 0 ? objectId(listUser) : userInfo,
         status: objectId(listStatus),
+        activeStatus: objectId(activeStatus),
+        groups:
+          listGroup?.length > 0
+            ? objectId(listGroup)
+            : objectId(myUserInfo?.groups),
+
         instance: objectId(listInstance),
         firstDate: firstDate,
         lastDate: lastDate,
@@ -93,6 +102,7 @@ export default function TasksListScreen(props) {
     [
       dispatch,
       listTaskModel,
+      listGroup,
       listStatus,
       listUser,
       listInstance,
@@ -101,20 +111,14 @@ export default function TasksListScreen(props) {
       taskModelId,
       userInfo,
       reference,
+      myUserInfo,
+      activeStatus,
     ]
   );
 
   useEffect(() => {
     dispatchTaskList(1, 15);
   }, [dispatchTaskList]);
-
-  const objectId = (objects) => {
-    if (objects) {
-      const tempObjects = objects.map(({ _id }) => _id);
-      return tempObjects;
-    }
-    return [];
-  };
 
   const tasksHeadCells = [
     // {
@@ -132,7 +136,19 @@ export default function TasksListScreen(props) {
       renderCell: (params) => (
         <div>
           <Link to={`/subtask/${params.row._id}/edit`}>
-            <button className="itemListEdit">{params.row.reference}</button>
+            <button
+              className={
+                moment(params.row.dedline).format("YYYY-MM-DD") <=
+                moment(new Date()).format("YYYY-MM-DD")
+                  ? "itemListAlert"
+                  : moment(params.row.dedline).format("YYYY-MM-DD") <
+                    moment(new Date()).add(3, "days").format("YYYY-MM-DD")
+                  ? "itemListWarning"
+                  : "itemListEdit"
+              }
+            >
+              {params.row.reference}
+            </button>
           </Link>
         </div>
       ),
@@ -177,17 +193,7 @@ export default function TasksListScreen(props) {
         </div>
       ),
     },
-    {
-      field: "endDate",
-      headerName: "End Date",
-      flex: 0.7,
-      headerClassName: "headeritem",
-      renderCell: (params) => (
-        <div className="row">
-          <p>{moment(params.value).locale("fr").format("DD/MM/YY")}</p>
-        </div>
-      ),
-    },
+
     {
       field: "dedline",
       headerName: "Dedline",
@@ -203,11 +209,21 @@ export default function TasksListScreen(props) {
     {
       field: "status",
       headerName: "Status",
-      flex: 1,
+      flex: 0.7,
       type: "string",
       headerClassName: "headeritem",
       renderCell: (params) => (
         <div className="cellItems">{params.row?.status?.name}</div>
+      ),
+    },
+    {
+      field: "responsibleGroup",
+      headerName: "Responsible Group",
+      flex: 1.3,
+      type: "string",
+      headerClassName: "headeritem",
+      renderCell: (params) => (
+        <div className="cellItems">{params.row?.responsibleGroup?.name}</div>
       ),
     },
     {
@@ -237,6 +253,8 @@ export default function TasksListScreen(props) {
         setListInstance={setListInstance}
         listUser={listUser}
         setListUsers={setListUsers}
+        listGroup={listGroup}
+        setListGroups={setListGroups}
         firstDate={firstDate}
         setFirstDate={setFirstDate}
         lastDate={lastDate}
@@ -263,14 +281,14 @@ export default function TasksListScreen(props) {
           onPageSizeChange={(data) => {
             dispatchTaskList(data < pages ? pageNumber : 1, data);
           }}
-          getRowClassName={(params) => {
-            return moment(params.row.dedline).format("YYYY-MM-DD") <=
-              moment(new Date()).format("YYYY-MM-DD")
-              ? "alertRed"
-              : moment(params.row.dedline).format("YYYY-MM-DD") <
-                  moment(new Date()).add(3, "days").format("YYYY-MM-DD") &&
-                  "alertOrange";
-          }}
+          // getRowClassName={(params) => {
+          //   return moment(params.row.dedline).format("YYYY-MM-DD") <=
+          //     moment(new Date()).format("YYYY-MM-DD")
+          //     ? "alertRed"
+          //     : moment(params.row.dedline).format("YYYY-MM-DD") <
+          //         moment(new Date()).add(3, "days").format("YYYY-MM-DD") &&
+          //         "alertOrange";
+          // }}
         />
       </div>
     </div>

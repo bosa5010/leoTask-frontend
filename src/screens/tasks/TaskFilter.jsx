@@ -13,6 +13,7 @@ import GridContainer from "../../components/GridContainer";
 import ReactSelect from "../../components/react-select/ReactSelect";
 import AppDateTimePicker from "../../components/appDateTimePicker/AppDateTimePicker";
 import moment from "../../../node_modules/moment/moment";
+import { objectId } from "../../utils";
 
 export default function TaskFilter({
   filter,
@@ -27,6 +28,8 @@ export default function TaskFilter({
   setListInstance,
   listUser,
   setListUsers,
+  listGroup,
+  setListGroups,
   firstDate,
   setFirstDate,
   lastDate,
@@ -40,6 +43,9 @@ export default function TaskFilter({
 }) {
   const taskList = useSelector((state) => state.taskList);
   const { tasks } = taskList;
+
+  const userSignin = useSelector((state) => state.userSignin);
+  const { userInfo: myUserInfo } = userSignin;
 
   const taskModelList = useSelector((state) => state.taskModelList);
   const {
@@ -62,7 +68,7 @@ export default function TaskFilter({
   const { loading: loadingUser, error: errorUser, users } = userList;
 
   const listOfActiveStatus = useCallback(() => {
-    if (status && status.length > 0) {
+    if (status?.length > 0) {
       var tempoStatus = status.filter(function (el) {
         return el.number <= 2;
       });
@@ -75,21 +81,32 @@ export default function TaskFilter({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(listStatuss({}));
+    listOfActiveStatus();
+  }, [listOfActiveStatus]);
 
-    dispatch(listUsers({}));
+  useEffect(() => {
+    dispatch(listStatuss({}));
 
     dispatch(listInstances({}));
 
     dispatch(listTaskModels({}));
-  }, [dispatch]);
+    listGroup === "" && setListGroups(myUserInfo?.groups);
+  }, [dispatch, myUserInfo, setListGroups, listGroup]);
 
   useEffect(() => {
-    listOfActiveStatus();
-  }, [listOfActiveStatus]);
+    dispatch(
+      listUsers({
+        groups: objectId(listGroup),
+      })
+    );
+  }, [dispatch, listGroup]);
 
   const handleChangeStatus = (e) => {
     setListStatus(e.length > 0 ? e : activeStatus);
+  };
+
+  const handleChangeGroup = (e) => {
+    setListGroups(e.length > 0 ? e : myUserInfo?.groups);
   };
 
   const handleInputChange = (e, list) => {
@@ -99,6 +116,21 @@ export default function TaskFilter({
           name: e,
           pageNumber: 1,
           pageSize: 15,
+        })
+      );
+  };
+
+  const handleInputChangeUsers = (e, list) => {
+    e !== "" &&
+      dispatch(
+        list({
+          name: e,
+          pageNumber: 1,
+          pageSize: 15,
+          groups:
+            listGroup?.length > 0
+              ? objectId(listGroup)
+              : objectId(myUserInfo?.groups),
         })
       );
   };
@@ -178,6 +210,13 @@ export default function TaskFilter({
                   return " " + item.name;
                 }) +
                 ` " `}
+            {listGroup &&
+              listGroup.length > 0 &&
+              `"Responsible Groups : ` +
+                listGroup.map((item) => {
+                  return " " + item.name;
+                }) +
+                ` " `}
             {listInstance &&
               listInstance.length > 0 &&
               `"Instances : ` +
@@ -244,12 +283,26 @@ export default function TaskFilter({
               label={"Status : "}
             />
           </div>
+          <div className="filterItems">
+            <ReactSelect
+              setSelectedOptions={setListGroups}
+              onChange={handleChangeGroup}
+              closeMenuOnSelect={true}
+              options={myUserInfo?.groups}
+              defaultValue={listGroup && listGroup}
+              isMulti={true}
+              isSearchable
+              name="Responsible Group :"
+              placeholder={"Groups"}
+              label={"Responsible Group : "}
+            />
+          </div>
           {!userInfo && (
             <div className="filterItems">
               <ReactSelect
                 setSelectedOptions={setListUsers}
                 onInputChange={(e) => {
-                  handleInputChange(e, listUsers);
+                  handleInputChangeUsers(e, listUsers);
                 }}
                 closeMenuOnSelect={true}
                 options={users}

@@ -112,7 +112,7 @@ export default function TaskModelScreen(props) {
     {
       field: "name",
       headerName: "Name",
-      flex: 0.5,
+      flex: 1,
       type: "string",
       headerClassName: "headeritem",
     },
@@ -127,7 +127,7 @@ export default function TaskModelScreen(props) {
       field: "taskTheme",
       headerName: "TASK THEME",
       type: "string",
-      flex: 0.5,
+      flex: 1,
       headerClassName: "headeritem",
       renderCell: (params) => (
         <div className="cellItems">{params.row?.taskTheme?.name}</div>
@@ -137,6 +137,14 @@ export default function TaskModelScreen(props) {
       field: "systems",
       headerName: "Systems",
       flex: 1,
+      headerClassName: "headeritem",
+      renderCell: (params) => stringList(params.value),
+      type: "string",
+    },
+    {
+      field: "groups",
+      headerName: "Groups",
+      flex: 2,
       headerClassName: "headeritem",
       renderCell: (params) => stringList(params.value),
       type: "string",

@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import EditModal from "./EditModal";
 import {
   deleteTaskTheme,
-  updateTaskTheme,
-  createTaskTheme,
   listTaskThemes,
 } from "../../redux/actions/taskThemeActions";
 import {
@@ -14,15 +11,10 @@ import {
   TASKTHEME_UPDATE_RESET,
 } from "../../redux/constants/taskThemeConstants";
 import AppDataGrid from "../../components/tables/AppDataGrid";
-import { DeleteOutline } from "@material-ui/icons";
-import ReactSelect from "../../components/react-select/ReactSelect";
-import { listTeams } from "../../redux/actions/teamActions";
+
 import { ActionStatus } from "../../components/ActionStatus";
 
 export default function TaskThemeScreen(props) {
-  const [taskThemeId, setTaskThemeId] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState();
-
   const taskThemeList = useSelector((state) => state.taskThemeList);
   const { loading, error, pages, taskThemes, pageNumber, pageSize } =
     taskThemeList;
@@ -48,9 +40,6 @@ export default function TaskThemeScreen(props) {
     error: errorDelete,
   } = taskThemeDelete;
 
-  const teamList = useSelector((state) => state.teamList);
-  const { loading: loadingTeam, error: errorTeam, teams } = teamList;
-
   const dispatch = useDispatch();
   useEffect(() => {
     if (successCreate) {
@@ -67,16 +56,7 @@ export default function TaskThemeScreen(props) {
     if (!successCreate && !successDelete && !successUpdate) {
       dispatch(listTaskThemes({ name: "", pageNumber: 1, pageSize: 15 }));
     }
-
-    if (teams && teams.length === 0) {
-      dispatch(
-        listTeams({
-          pageNumber: 1,
-          pageSize: 15,
-        })
-      );
-    }
-  }, [dispatch, successCreate, successUpdate, successDelete, teams]);
+  }, [dispatch, successCreate, successUpdate, successDelete]);
 
   useEffect(() => {
     if (successDelete) {
@@ -96,42 +76,14 @@ export default function TaskThemeScreen(props) {
     );
   };
 
-  const createHandler = (name, description) => {
-    dispatch(
-      createTaskTheme({
-        name: name,
-        description: description,
-        teams: selectedOptions,
-      })
-    );
-  };
-
-  const updateHandler = (name, desc) => {
-    dispatch(
-      updateTaskTheme({
-        _id: taskThemeId,
-        name: name,
-        description: desc,
-        teams: selectedOptions,
-      })
-    );
+  const updateHandler = (taskThemeId) => {
+    props.history.push(`/tasktheme/${taskThemeId}/edit`);
   };
 
   const deleteHandler = (taskThemeId) => {
     if (window.confirm("Are you sure to delete")) {
       dispatch(deleteTaskTheme(taskThemeId));
     }
-  };
-
-  const handleInputChange = (e) => {
-    e !== "" &&
-      dispatch(
-        listTeams({
-          name: e,
-          pageNumber: 1,
-          pageSize: 15,
-        })
-      );
   };
 
   const taskThemesHeadCells = [
@@ -169,60 +121,6 @@ export default function TaskThemeScreen(props) {
       ),
       type: "string",
     },
-    {
-      field: "action",
-      headerName: "ACTIONS",
-      type: "number",
-      flex: 1,
-      headerClassName: "headeritem",
-
-      renderCell: (params) => {
-        return (
-          <>
-            <EditModal
-              onClose={() => {
-                setTaskThemeId("");
-                dispatch({ type: TASKTHEME_UPDATE_RESET });
-              }}
-              onOpen={() => {
-                setTaskThemeId(params.row._id);
-                dispatch({ type: TASKTHEME_UPDATE_RESET });
-              }}
-              title={"Update Task Theme"}
-              className={"itemListEdit"}
-              onSubmit={updateHandler}
-              loading={loadingUpdate}
-              success={successUpdate}
-              error={errorUpdate}
-              myProp={
-                <div>
-                  <ReactSelect
-                    closeMenuOnSelect={true}
-                    defaultValue={params.row.teams}
-                    setSelectedOptions={setSelectedOptions}
-                    onInputChange={handleInputChange}
-                    options={teams}
-                    isMulti={true}
-                    isSearchable
-                    name="Teams"
-                    loading={loadingTeam}
-                    error={errorTeam}
-                    label={"Teams"}
-                  />
-                </div>
-              }
-              item={params.row}
-              component={"Update"}
-            />
-            <DeleteOutline
-              className="itemListDelete"
-              onClick={() => deleteHandler(params.row._id)}
-              style={{ fontSize: 30 }}
-            />
-          </>
-        );
-      },
-    },
   ];
 
   return (
@@ -240,36 +138,15 @@ export default function TaskThemeScreen(props) {
             autoComplete="off"
           />
         </div>
-        <div>
-          <EditModal
-            onClose={() => {
-              setTaskThemeId("");
-              dispatch({ type: TASKTHEME_CREATE_RESET });
-            }}
-            title={"Add Task Theme"}
-            className={"priamry"}
-            onSubmit={createHandler}
-            loading={loadingCreate}
-            success={successCreate}
-            error={errorCreate}
-            myProp={
-              <div>
-                <ReactSelect
-                  closeMenuOnSelect={true}
-                  setSelectedOptions={setSelectedOptions}
-                  onInputChange={handleInputChange}
-                  options={teams}
-                  isMulti={true}
-                  isSearchable
-                  name="Teams"
-                  loading={loadingTeam}
-                  error={errorTeam}
-                  label={"Teams"}
-                />
-              </div>
-            }
-          />
-        </div>
+        <button
+          type="button"
+          className="adlButton row"
+          onClick={() => {
+            props.history && props.history.push(`/tasktheme/${null}/edit`);
+          }}
+        >
+          Add TaskTheme
+        </button>
       </div>
 
       <ActionStatus
@@ -299,7 +176,6 @@ export default function TaskThemeScreen(props) {
         rowCount={Number(pages)}
         loading={loading}
         error={error}
-        popper={false}
         onPageChange={(data) => {
           dispatch(
             listTaskThemes({
@@ -316,6 +192,8 @@ export default function TaskThemeScreen(props) {
             })
           );
         }}
+        onUpdatePress={updateHandler}
+        onDeletePress={deleteHandler}
       />
     </div>
   );

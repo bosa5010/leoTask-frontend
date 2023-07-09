@@ -84,6 +84,10 @@ const FORM_VALIDATION = Yup.object().shape({
   closedDate: Yup.date().required("Please Enter Close Date "),
   dedline: Yup.date().required("Please Enter Dedline "),
   addMany: Yup.boolean(),
+  responsibleGroup: Yup.object().required("Please Choose Responsible Group"),
+  responsibleGroups: Yup.array().required("Please Choose Responsible Groups"),
+  responsibleTeam: Yup.object().required("Please Choose Responsible Team"),
+  responsibleTeams: Yup.array().required("Please Choose Responsible Teams"),
 });
 
 function lastweek() {
@@ -117,6 +121,10 @@ export default function TaskEditScreen(props) {
     createdBy: "",
     responsibleUser: "",
     responsibleUsers: "",
+    responsibleGroup: "",
+    responsibleGroups: "",
+    responsibleTeam: "",
+    responsibleTeams: "",
     status: "",
     addMany: false,
   });
@@ -126,6 +134,7 @@ export default function TaskEditScreen(props) {
   const [lastWeek] = useState(lastweek());
   const [selectedSystem, setSelectedSystems] = useState("");
   const [selectedTaskModel, setSelectedTaskModel] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("");
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [reference, setReference] = useState("");
@@ -197,10 +206,19 @@ export default function TaskEditScreen(props) {
       })
     );
 
-    dispatch(listUsers({ name: "", pageNumber: 1, pageSize: 15 }));
-
     dispatch(listStatuss({ name: "", pageNumber: 1, pageSize: 15 }));
   }, [dispatch, lastWeek]);
+
+  useEffect(() => {
+    dispatch(
+      listUsers({
+        name: "",
+        pageNumber: 1,
+        pageSize: 15,
+        groups: selectedGroup._id,
+      })
+    );
+  }, [dispatch, selectedGroup]);
 
   useEffect(() => {
     if (successCreate) {
@@ -233,6 +251,10 @@ export default function TaskEditScreen(props) {
         dedline: task ? task.dedline : "",
         responsibleUser: task ? task.responsibleUser : "",
         responsibleUsers: task ? task.responsibleUsers : "",
+        responsibleGroup: task ? task.responsibleGroup : "",
+        responsibleGroups: task ? task.responsibleGroups : "",
+        responsibleTeam: task ? task.responsibleTeam : "",
+        responsibleTeams: task ? task.responsibleTeams : "",
         status: task ? task.status : "",
       });
 
@@ -240,6 +262,7 @@ export default function TaskEditScreen(props) {
       setStartDate(task.startWeek);
       setEndDate(task.endWeek);
       setReference(task.reference);
+      setSelectedGroup(task.responsibleGroup);
     }
   }, [task, dispatch, taskId, successUpdate]);
 
@@ -294,6 +317,18 @@ export default function TaskEditScreen(props) {
       );
   };
 
+  const handleInputChangeUser = (e, list) => {
+    e !== "" &&
+      dispatch(
+        list({
+          name: e,
+          pageNumber: 1,
+          pageSize: 15,
+          groups: selectedGroup._id,
+        })
+      );
+  };
+
   const handleInputChangeStartDate = (e, list) => {
     e !== "" &&
       dispatch(
@@ -340,9 +375,15 @@ export default function TaskEditScreen(props) {
 
     setFieldValue("system", "");
     setFieldValue("instance", "");
+    setFieldValue("responsibleUser", "");
+    setFieldValue("responsibleUsers", "");
+    setFieldValue("responsibleGroup", "");
+    setFieldValue("responsibleTeam", "");
     setFieldValue("status", tempStatus);
     setFieldValue("currentStep", tempStep || "");
     setFieldValue("description", object.description);
+    setFieldValue("responsibleGroups", object.groups);
+    setFieldValue("responsibleTeams", object.taskTheme.teams);
   };
 
   const onChangeSystem = (setFieldValue, values, value, object) => {
@@ -407,6 +448,13 @@ export default function TaskEditScreen(props) {
     } else if (values["endDate"] && values["endDate"] < value) {
       setFieldValue("dedline", values["endDate"]);
     }
+  };
+
+  const onChangeGroup = (setFieldValue, values, value, object) => {
+    setSelectedGroup(object);
+    setFieldValue("responsibleUser", "");
+    setFieldValue("responsibleUsers", "");
+    setFieldValue("responsibleTeam", object.team);
   };
 
   const addManyHandler = (setFieldValue, values) => {
@@ -833,11 +881,45 @@ export default function TaskEditScreen(props) {
                       <div>
                         <ReactSelectForm
                           closeMenuOnSelect={true}
+                          instruction={onChangeGroup}
+                          options={selectedTaskModel?.groups}
+                          isMulti={false}
+                          isDisabled={!selectedTaskModel}
+                          isSearchable
+                          name="responsibleGroup"
+                          loading={loadingTaskModel}
+                          error={errorTaskModel}
+                          label={"Responsible Group"}
+                        />
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={6} className={classes.formField}>
+                      <div>
+                        <ReactSelectForm
+                          closeMenuOnSelect={true}
+                          options={selectedTaskModel?.groups}
+                          isMulti={true}
+                          isDisabled={true}
+                          isSearchable
+                          name="responsibleGroups"
+                          loading={loadingTaskModel}
+                          error={errorTaskModel}
+                          label={"Responsible Groups"}
+                        />
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={6} className={classes.formField}>
+                      <div>
+                        <ReactSelectForm
+                          closeMenuOnSelect={true}
                           onInputChange={(e) => {
-                            handleInputChange(e, listUsers);
+                            handleInputChangeUser(e, listUsers);
                           }}
                           options={users && users}
                           isMulti={false}
+                          isDisabled={!selectedGroup}
                           isSearchable
                           name="responsibleUser"
                           loading={loadingUser}
@@ -851,18 +933,49 @@ export default function TaskEditScreen(props) {
                       <div>
                         <ReactSelectForm
                           closeMenuOnSelect={true}
-                          setSelectedOptions={setSelectedSystems}
-                          // instruction={onChangeSystem}
                           onInputChange={(e) => {
-                            handleInputChange(e, listUsers);
+                            handleInputChangeUser(e, listUsers);
                           }}
                           options={users && users}
+                          isDisabled={!selectedGroup}
                           isMulti={true}
                           isSearchable
                           name="responsibleUsers"
                           loading={loadingUser}
                           error={errorUser}
                           label={"Responsible Users"}
+                        />
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={6} className={classes.formField}>
+                      <div>
+                        <ReactSelectForm
+                          closeMenuOnSelect={true}
+                          options={selectedTaskModel?.taskTheme?.teams}
+                          isMulti={false}
+                          isDisabled={true}
+                          isSearchable
+                          name="responsibleTeam"
+                          loading={loadingTaskModel}
+                          error={errorTaskModel}
+                          label={"Responsible Team"}
+                        />
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={6} className={classes.formField}>
+                      <div>
+                        <ReactSelectForm
+                          closeMenuOnSelect={true}
+                          options={selectedTaskModel?.Teams}
+                          isMulti={true}
+                          isDisabled={true}
+                          isSearchable
+                          name="responsibleTeams"
+                          loading={loadingTaskModel}
+                          error={errorTaskModel}
+                          label={"Responsible Teams"}
                         />
                       </div>
                     </Grid>

@@ -27,6 +27,7 @@ export default function UserListScreen(props) {
     loading: loadingUpdate,
     error: errorUpdate,
     success: successUpdate,
+    message: messageUpdate,
   } = userUpdate;
 
   const dispatch = useDispatch();
@@ -159,7 +160,7 @@ export default function UserListScreen(props) {
         loading={loadingUpdate}
         error={errorUpdate}
         success={successUpdate}
-        message={"User Updated Successfuly"}
+        message={messageUpdate}
       />
 
       <AppDataGrid

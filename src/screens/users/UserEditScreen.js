@@ -29,6 +29,8 @@ import { listTeams } from "../../redux/actions/teamActions";
 import AppInputForm from "../../components/FormsUI/AppInputFrom/AppInputForm";
 import AppCheckboxForm from "../../components/FormsUI/AppCheckboxFrom/AppCheckboxForm";
 import { ActionStatus } from "../../components/ActionStatus";
+import { listGroups } from "../../redux/actions/groupActions";
+import { objectId } from "../../utils";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -69,8 +71,9 @@ const FORM_VALIDATION = Yup.object().shape({
   isSuperAdmin: Yup.boolean(),
 
   team: Yup.object().required("Please Select team"),
+  groups: Yup.array().required("Please Select Group"),
   managedTeams: Yup.array().when("isAdmin", {
-    is: true,
+    is: false,
     then: Yup.array().required("Please Select Managed team"),
   }),
 });
@@ -90,17 +93,23 @@ export default function UserEditScreen(props) {
     password: "",
     isAdmin: false,
     isSuperAdmin: false,
+    groups: [],
     team: "",
-    managedTeam: [],
+    managedTeams: [],
   });
 
   const [open, setOpen] = React.useState(false);
+  const [openReset, setOpenReset] = React.useState(false);
   const [isAdmin, setIsAdmin] = React.useState(true);
+  const [selectedTeam, setSelectedTeam] = useState("");
 
   const classes = useStyles();
 
   const teamList = useSelector((state) => state.teamList);
   const { loading: loadingTeam, error: errorTeam, teams } = teamList;
+
+  const groupList = useSelector((state) => state.groupList);
+  const { loading: loadingGroup, error: errorGroup, groups } = groupList;
 
   const userRegister = useSelector((state) => state.userRegister);
   const {
@@ -117,6 +126,7 @@ export default function UserEditScreen(props) {
     loading: loadingUpdate,
     error: errorUpdate,
     success: successUpdate,
+    message: messageUpdate,
   } = userUpdate;
 
   const dispatch = useDispatch();
@@ -149,10 +159,12 @@ export default function UserEditScreen(props) {
         password: user ? user.password : "",
         isAdmin: user ? user.isAdmin : "",
         isSuperAdmin: user ? user.isSuperAdmin : "",
+        groups: user ? user.groups : "",
         team: user ? user.team : "",
         managedTeams: user ? user.managedTeams : "",
       });
       setIsAdmin(user && !user.isAdmin);
+      setSelectedTeam(user?.managedTeams ? user?.managedTeams : user?.team);
     }
   }, [user, dispatch, userId, successUpdate, props.history]);
 
@@ -182,6 +194,18 @@ export default function UserEditScreen(props) {
     dispatch(
       updateUser({
         _id: userId,
+        actionType: "update",
+        ...values,
+      })
+    );
+    resetForm();
+  };
+
+  const resetPasswordHandler = (values, resetForm) => {
+    dispatch(
+      updateUser({
+        _id: userId,
+        actionType: "resetpassword",
         ...values,
       })
     );
@@ -215,6 +239,7 @@ export default function UserEditScreen(props) {
     if (values["isAdmin"]) {
       setFieldValue("isSuperAdmin", !values["isAdmin"]);
       setFieldValue("managedTeams", []);
+      setFieldValue("groups", "");
     }
     setIsAdmin(values["isAdmin"]);
   };
@@ -224,6 +249,40 @@ export default function UserEditScreen(props) {
       setFieldValue("isAdmin", !values["isSuperAdmin"]);
       setIsAdmin(false);
     }
+  };
+
+  const onChangeTeam = (setFieldValue, values, value, object) => {
+    if (values["managedTeams"].length === 0) {
+      setSelectedTeam(object);
+      setFieldValue("groups", "");
+    }
+  };
+
+  useEffect(() => {
+    dispatch(
+      listGroups({
+        name: "",
+        pageNumber: 1,
+        pageSize: 15,
+        team:
+          selectedTeam?.length > 0 ? objectId(selectedTeam) : selectedTeam._id,
+      })
+    );
+  }, [dispatch, selectedTeam]);
+
+  const handleInputChangeGroup = (e) => {
+    e !== "" &&
+      dispatch(
+        listGroups({
+          name: e,
+          pageNumber: 1,
+          pageSize: 15,
+          team:
+            selectedTeam?.length > 0
+              ? objectId(selectedTeam)
+              : selectedTeam._id,
+        })
+      );
   };
 
   return (
@@ -261,7 +320,7 @@ export default function UserEditScreen(props) {
                     loading={loadingUpdate}
                     error={errorUpdate}
                     success={successUpdate}
-                    message={"User Updated Successfuly"}
+                    message={messageUpdate}
                   />
 
                   <GridContainer title={"User Info"}>
@@ -339,6 +398,7 @@ export default function UserEditScreen(props) {
                           onInputChange={(e) => {
                             handleInputChange(e, listTeams);
                           }}
+                          instruction={onChangeTeam}
                           options={teams}
                           required={true}
                           isMulti={false}
@@ -354,6 +414,24 @@ export default function UserEditScreen(props) {
                       <div>
                         <ReactSelectForm
                           closeMenuOnSelect={true}
+                          onInputChange={handleInputChangeGroup}
+                          options={groups}
+                          required={true}
+                          isMulti={true}
+                          isDisabled={selectedTeam === ""}
+                          isSearchable
+                          name="groups"
+                          loading={loadingGroup}
+                          error={errorGroup}
+                          label={"Group"}
+                        />
+                      </div>
+                    </Grid>
+                    <Grid item xs={4} className={classes.formField}>
+                      <div>
+                        <ReactSelectForm
+                          closeMenuOnSelect={true}
+                          setSelectedOptions={setSelectedTeam}
                           onInputChange={(e) => {
                             handleInputChange(e, listTeams);
                           }}
@@ -372,12 +450,17 @@ export default function UserEditScreen(props) {
                   </GridContainer>
 
                   <GridContainer>
-                    <Grid item xs={10}>
+                    <Grid item xs={8}>
                       <Button>{!userId ? "Add User" : "Update User"}</Button>
                     </Grid>
                     <Grid item xs={2}>
                       <FormButton onPress={() => setOpen(true)}>
                         Referech
+                      </FormButton>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <FormButton onPress={() => setOpenReset(true)}>
+                        Reset Password
                       </FormButton>
                     </Grid>
                   </GridContainer>
@@ -389,6 +472,14 @@ export default function UserEditScreen(props) {
                     onClose={refrechAll}
                     open={open}
                     setOpen={setOpen}
+                  />
+                  <AppDialog
+                    message={"Do you want to Reset the Password ?    "}
+                    title={"Reset Password ?"}
+                    agree={"Reset Password"}
+                    onClose={resetPasswordHandler}
+                    open={openReset}
+                    setOpen={setOpenReset}
                   />
                 </Grid>
               </Form>

@@ -83,7 +83,7 @@ export const createSubTask = (subTask) => async (dispatch, getState) => {
     );
     dispatch({
       type: subTaskActions.SUBTASK_CREATE_SUCCESS,
-      payload: data.subTask,
+      payload: data,
     });
   } catch (error) {
     dispatch({

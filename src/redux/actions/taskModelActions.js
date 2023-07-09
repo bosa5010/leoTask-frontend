@@ -3,7 +3,7 @@ import { url } from "../api/index";
 import * as taskModelActions from "../constants/taskModelConstants";
 
 export const listTaskModels =
-  ({ name = "", pageNumber = "", pageSize = "" }) =>
+  ({ name = "", pageNumber = "", pageSize = "", groups = "" }) =>
   async (dispatch, getState) => {
     dispatch({
       type: taskModelActions.TASKMODEL_LIST_REQUEST,
@@ -13,7 +13,7 @@ export const listTaskModels =
     } = getState();
     try {
       const { data } = await axios.get(
-        `${url}/api/taskModels?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}`,
+        `${url}/api/taskModels?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&groups=${groups}`,
         { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       dispatch({
@@ -29,7 +29,7 @@ export const listTaskModels =
   };
 
 export const frozenListTaskModels =
-  ({ name = "", pageNumber = "", pageSize = "" }) =>
+  ({ name = "", pageNumber = "", pageSize = "", groups = "" }) =>
   async (dispatch, getState) => {
     dispatch({
       type: taskModelActions.TASKMODEL_FROZEN_LIST_REQUEST,
@@ -39,7 +39,7 @@ export const frozenListTaskModels =
     } = getState();
     try {
       const { data } = await axios.get(
-        `${url}/api/taskModels?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}`,
+        `${url}/api/taskModels?pageNumber=${pageNumber}&pageSize=${pageSize}&name=${name}&groups=${groups}`,
         { headers: { Authorization: `Bearer ${userInfo.token}` } }
       );
       dispatch({

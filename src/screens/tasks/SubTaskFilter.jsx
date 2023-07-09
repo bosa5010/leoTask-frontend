@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./task.css";
 
 import { useDispatch, useSelector } from "react-redux";
 import { listSystems } from "../../redux/actions/systemActions";
-import { listUsers } from "../../redux/actions/userActions";
 import { listInstances } from "../../redux/actions/instanceActions";
 import { listTaskModels } from "../../redux/actions/taskModelActions";
 import { listItems } from "../../redux/actions/itemActions";
@@ -14,7 +13,12 @@ import ReactSelect from "../../components/react-select/ReactSelect";
 import ExportSubTaskToExcel from "../../components/excel/ExportSubTaskToExcel";
 import { BsFilterCircle } from "react-icons/bs";
 import AppDateTimePicker from "../../components/appDateTimePicker/AppDateTimePicker";
-import { listTasks } from "../../redux/actions/taskActions";
+import {
+  objectId,
+  taskModelItemStatus,
+  taskModelItems,
+  taskModelSystems,
+} from "../../utils";
 
 export default function SubTaskFilter({
   filter,
@@ -40,8 +44,14 @@ export default function SubTaskFilter({
   dispatchSubTaskList,
   href = "/subtasklist",
 }) {
+  const [selectedSystems, setSelectedSystems] = useState();
+  const [selectedItems, setSelectedItems] = useState();
+  const [selectedItemsStatus, setSelectedItemsStatus] = useState();
   const subTaskList = useSelector((state) => state.subTaskList);
   const { subTasks } = subTaskList;
+
+  const userSignin = useSelector((state) => state.userSignin);
+  const { userInfo } = userSignin;
 
   const taskModelList = useSelector((state) => state.taskModelList);
   const {
@@ -50,19 +60,6 @@ export default function SubTaskFilter({
     taskModels,
   } = taskModelList;
 
-  const systemList = useSelector((state) => state.systemList);
-  const { loading: loadingSystems, error: errorSystems, systems } = systemList;
-
-  const itemList = useSelector((state) => state.itemList);
-  const { loading: loadingItems, error: errorItems, items } = itemList;
-
-  const itemStatusList = useSelector((state) => state.itemStatusList);
-  const {
-    loading: loadingItemStatus,
-    error: errorItemStatus,
-    itemStatuss,
-  } = itemStatusList;
-
   const instanceList = useSelector((state) => state.instanceList);
   const {
     loading: loadingInstance,
@@ -70,28 +67,26 @@ export default function SubTaskFilter({
     instances,
   } = instanceList;
 
-  const taskList = useSelector((state) => state.taskList);
-  const { loading: loadingTask, error: errorTask, tasks } = taskList;
-
-  const userList = useSelector((state) => state.userList);
-  const { loading: loadingUser, error: errorUser, users } = userList;
-
   const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(listSystems({}));
+    dispatch(listTaskModels({ groups: objectId(userInfo?.groups) }));
+  }, [dispatch, userInfo]);
 
-    dispatch(listUsers({}));
+  useEffect(() => {
+    setLisTaskModel(taskModels && taskModels[0]);
+  }, [dispatch, taskModels, setLisTaskModel]);
 
-    dispatch(listInstances({}));
+  useEffect(() => {
+    if (listTaskModel) {
+      setSelectedSystems(taskModelSystems(listTaskModel));
+      setSelectedItems(taskModelItems(listTaskModel));
+    }
+  }, [setSelectedSystems, setSelectedItems, listTaskModel]);
 
-    dispatch(listTaskModels({}));
-
-    dispatch(listItems({}));
-
-    dispatch(listItemStatuss({}));
-
-    dispatch(listTasks({}));
-  }, [dispatch]);
+  useEffect(() => {
+    dispatch(listInstances({ systems: objectId(listOfSystems) }));
+  }, [dispatch, listOfSystems]);
 
   const handleInputChange = (e, list) => {
     e !== "" &&
@@ -104,15 +99,46 @@ export default function SubTaskFilter({
       );
   };
 
-  const handleTaskInputChange = (e, list) => {
+  const handleInputChangeTaskModel = (e, list) => {
     e !== "" &&
       dispatch(
         list({
-          reference: e,
+          name: e,
           pageNumber: 1,
           pageSize: 100,
+          groups: objectId(userInfo.groups),
         })
       );
+  };
+  const handleInputChangeInstance = (e, list) => {
+    e !== "" &&
+      dispatch(
+        list({
+          name: e,
+          pageNumber: 1,
+          pageSize: 100,
+          systems: objectId(listOfSystems),
+        })
+      );
+  };
+
+  const onChangeTaskModel = (value) => {
+    if (value) {
+      setSelectedSystems(taskModelSystems(value));
+      setSelectedItems(taskModelItems(value));
+      setListSystems("");
+      setListInstance("");
+      setListItem("");
+      setListItemStatus("");
+    }
+  };
+
+  const onChangeItem = (items) => {
+    if (items?.length > 0) {
+      setSelectedItemsStatus(taskModelItemStatus(items));
+    } else {
+      setListItemStatus("");
+    }
   };
 
   return (
@@ -149,20 +175,20 @@ export default function SubTaskFilter({
             <BsFilterCircle style={{ fontSize: "2.5rem" }} />
           </button>
           <a href={href} className="link">
-            {listOfTasks &&
-              listOfTasks.length > 0 &&
-              `"Tasks : ` +
-                listOfTasks.map((item) => {
-                  return " " + item.reference;
-                }) +
-                ` " `}
-            {listUser &&
-              listUser.length > 0 &&
-              `"Responsible Users : ` +
-                listUser.map((item) => {
+            {listTaskModel &&
+              ` "Task Models : ` +
+                [listTaskModel].map((item) => {
                   return " " + item.name;
                 }) +
                 ` " `}
+            {listOfSystems &&
+              listOfSystems.length > 0 &&
+              ` "Systems : ` +
+                listOfSystems.map((item) => {
+                  return " " + item.name;
+                }) +
+                ` " `}
+
             {listInstance &&
               listInstance.length > 0 &&
               `"Instances : ` +
@@ -171,20 +197,6 @@ export default function SubTaskFilter({
                 }) +
                 ` " `}
 
-            {listOfSystems &&
-              listOfSystems.length > 0 &&
-              ` "Systems : ` +
-                listOfSystems.map((item) => {
-                  return " " + item.name;
-                }) +
-                ` " `}
-            {listTaskModel &&
-              listTaskModel.length > 0 &&
-              ` "Task Models : ` +
-                listTaskModel.map((item) => {
-                  return " " + item.name;
-                }) +
-                ` " `}
             {firstDate &&
               `" Start Date : ` +
                 moment(firstDate).format("ddd DD MM YYYY") +
@@ -200,33 +212,15 @@ export default function SubTaskFilter({
         <GridContainer title={"Filter"}>
           <div className="filterItems">
             <ReactSelect
-              setSelectedOptions={setListOfTasks}
-              onInputChange={(e) => {
-                handleTaskInputChange(e, listTasks);
-              }}
-              closeMenuOnSelect={true}
-              options={tasks}
-              defaultValue={listOfTasks}
-              isMulti={true}
-              isSearchable
-              name="Tasks :"
-              loading={loadingTask}
-              error={errorTask}
-              getOptionLabel={({ reference }) => reference}
-              placeholder={"Tasks"}
-              label={"Tasks :"}
-            />
-          </div>
-          <div className="filterItems">
-            <ReactSelect
               setSelectedOptions={setLisTaskModel}
               onInputChange={(e) => {
-                handleInputChange(e, listTaskModels);
+                handleInputChangeTaskModel(e, listTaskModels);
               }}
+              onChange={onChangeTaskModel}
               closeMenuOnSelect={true}
               options={taskModels}
               defaultValue={listTaskModel}
-              isMulti={true}
+              isMulti={false}
               isSearchable
               name="Task Models :"
               loading={loadingTaskModel}
@@ -235,24 +229,7 @@ export default function SubTaskFilter({
               label={"Task Models :"}
             />
           </div>
-          <div className="filterItems">
-            <ReactSelect
-              setSelectedOptions={setListUsers}
-              onInputChange={(e) => {
-                handleInputChange(e, listUsers);
-              }}
-              closeMenuOnSelect={true}
-              options={users}
-              defaultValue={listUser}
-              isMulti={true}
-              isSearchable
-              name="Responsible Users :"
-              loading={loadingUser}
-              error={errorUser}
-              placeholder={"Users"}
-              label={"Responsible Users : "}
-            />
-          </div>
+
           <div className="filterItems">
             <ReactSelect
               closeMenuOnSelect={true}
@@ -260,13 +237,15 @@ export default function SubTaskFilter({
               onInputChange={(e) => {
                 handleInputChange(e, listSystems);
               }}
-              options={systems}
+              options={selectedSystems}
+              isDisabled={listTaskModel?.length === 0}
               defaultValue={listOfSystems}
+              value={listOfSystems}
               isMulti={true}
               isSearchable
               name="Systems :"
-              loading={loadingSystems}
-              error={errorSystems}
+              loading={loadingTaskModel}
+              error={errorTaskModel}
               placeholder={"Systems"}
               label={"Systems : "}
             />
@@ -276,13 +255,15 @@ export default function SubTaskFilter({
             <ReactSelect
               setSelectedOptions={setListInstance}
               onInputChange={(e) => {
-                handleInputChange(e, listInstances);
+                handleInputChangeInstance(e, listInstances);
               }}
               closeMenuOnSelect={true}
               options={instances}
               isMulti={true}
               defaultValue={listInstance && listInstance}
+              value={listInstance && listInstance}
               isSearchable
+              isDisabled={listOfSystems?.length === 0}
               name="Instances :"
               loading={loadingInstance}
               error={errorInstance}
@@ -297,13 +278,16 @@ export default function SubTaskFilter({
                 handleInputChange(e, listItems);
               }}
               closeMenuOnSelect={true}
-              options={items}
+              onChange={onChangeItem}
+              options={selectedItems}
+              isDisabled={listTaskModel?.length === 0}
               isMulti={true}
               defaultValue={listItem && listItem}
+              value={listItem && listItem}
               isSearchable
               name="Items :"
-              loading={loadingItems}
-              error={errorItems}
+              loading={loadingTaskModel}
+              error={errorTaskModel}
               placeholder={"Items"}
               label={"Items : "}
             />
@@ -315,13 +299,15 @@ export default function SubTaskFilter({
                 handleInputChange(e, listItemStatuss);
               }}
               closeMenuOnSelect={true}
-              options={itemStatuss}
+              options={selectedItemsStatus}
+              isDisabled={listItem?.length === 0}
               isMulti={true}
-              defaultValue={listItemStatus && listItemStatus}
+              defaultValue={listItemStatus}
+              value={listItemStatus}
               isSearchable
               name="ItemStatuss :"
-              loading={loadingItemStatus}
-              error={errorItemStatus}
+              loading={loadingTaskModel}
+              error={errorTaskModel}
               placeholder={"ItemStatus"}
               label={"ItemStatus : "}
             />

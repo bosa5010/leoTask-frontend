@@ -18,6 +18,7 @@ import moment from "../../../node_modules/moment/moment";
 import AppDataGrid from "../../components/tables/AppDataGrid";
 import { Link } from "react-router-dom";
 import SubTaskFilter from "../tasks/SubTaskFilter";
+import { objectId } from "../../utils";
 
 function customizeTooltip(args) {
   return {
@@ -27,15 +28,13 @@ function customizeTooltip(args) {
 
 export default function DashboardScreen() {
   const [filter, setFilter] = useState(false);
-  const [listOfSystems, setListSystems] = useState();
-  const [listTaskModel, setLisTaskModel] = useState();
-  const [listInstance, setListInstance] = useState();
-  const [listItem, setListItem] = useState();
-  const [listOfTasks, setListOfTasks] = useState();
-  const [listItemStatus, setListItemStatus] = useState();
-  const [listUser, setListUsers] = useState();
-  const [firstDate, setFirstDate] = useState();
-  const [lastDate, setLastDate] = useState();
+  const [listOfSystems, setListSystems] = useState("");
+  const [listTaskModel, setLisTaskModel] = useState("");
+  const [listInstance, setListInstance] = useState("");
+  const [listItem, setListItem] = useState("");
+  const [listItemStatus, setListItemStatus] = useState("");
+  const [firstDate, setFirstDate] = useState("");
+  const [lastDate, setLastDate] = useState("");
 
   let pivotGrid = useRef();
   let chart = useRef();
@@ -50,13 +49,11 @@ export default function DashboardScreen() {
       let tempObject = {
         pageNumber,
         pageSize,
-        taskModels: objectId(listTaskModel),
-        users: objectId(listUser),
+        taskModels: listTaskModel?._id,
         systems: objectId(listOfSystems),
         instance: objectId(listInstance),
         items: objectId(listItem),
         itemStatus: objectId(listItemStatus),
-        tasks: objectId(listOfTasks),
         firstDate: firstDate,
         lastDate: lastDate,
         taskStep: "null",
@@ -70,8 +67,6 @@ export default function DashboardScreen() {
       dispatch,
       listTaskModel,
       listOfSystems,
-      listOfTasks,
-      listUser,
       listInstance,
       listItem,
       listItemStatus,
@@ -83,14 +78,6 @@ export default function DashboardScreen() {
   useEffect(() => {
     dispatchSubTaskList(1, 100);
   }, [dispatchSubTaskList]);
-
-  const objectId = (objects) => {
-    if (objects) {
-      const tempObjects = objects.map(({ _id }) => _id);
-      return tempObjects;
-    }
-    return [];
-  };
 
   useEffect(() => {
     pivotGrid.bindChart(chart, {
@@ -310,14 +297,10 @@ export default function DashboardScreen() {
         setLisTaskModel={setLisTaskModel}
         listInstance={listInstance}
         setListInstance={setListInstance}
-        listOfTasks={listOfTasks}
-        setListOfTasks={setListOfTasks}
         listItem={listItem}
         setListItem={setListItem}
         listItemStatus={listItemStatus}
         setListItemStatus={setListItemStatus}
-        listUser={listUser}
-        setListUsers={setListUsers}
         firstDate={firstDate}
         setFirstDate={setFirstDate}
         lastDate={lastDate}

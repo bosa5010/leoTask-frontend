@@ -19,6 +19,7 @@ import ReactSelect from "../../components/react-select/ReactSelect";
 import GridContainer from "../../components/GridContainer";
 import { Grid } from "../../../node_modules/@material-ui/core/index";
 import { BsFilterCircle } from "react-icons/bs";
+import { objectId } from "../../utils";
 
 export default function CalenderScreen(props) {
   const [listOfWeeks, setListWeeks] = useState();
@@ -127,14 +128,6 @@ export default function CalenderScreen(props) {
 
   const updateHandler = (calenderId) => {
     props.history.push(`/calender/${calenderId}/edit`);
-  };
-
-  const objectId = (objects) => {
-    if (objects) {
-      const tempObjects = objects.map(({ _id }) => _id);
-      return tempObjects;
-    }
-    return [];
   };
 
   const calendersHeadCells = [

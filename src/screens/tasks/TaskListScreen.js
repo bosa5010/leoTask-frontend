@@ -15,6 +15,7 @@ import moment from "../../../node_modules/moment/moment";
 import AppDialog from "../../components/appDialog/AppDialog";
 import { ActionStatus } from "../../components/ActionStatus";
 import TaskFilter from "./TaskFilter";
+import { objectId } from "../../utils";
 
 export default function TaskListScreen(props) {
   const [cellDescription, setCellDescription] = useState("");
@@ -24,6 +25,7 @@ export default function TaskListScreen(props) {
   const [listTaskModel, setLisTaskModel] = useState();
   const [listInstance, setListInstance] = useState();
   const [listUser, setListUsers] = useState();
+  const [listGroup, setListGroups] = useState();
   const [firstDate, setFirstDate] = useState(
     new moment(new Date()).subtract(12, "months").toDate()
   );
@@ -54,7 +56,9 @@ export default function TaskListScreen(props) {
         pageSize: pageSize,
         taskModels: objectId(listTaskModel),
         users: objectId(listUser),
+        groups: objectId(listGroup),
         status: objectId(listStatus),
+        activeStatus: objectId(activeStatus),
         instance: objectId(listInstance),
         firstDate: firstDate,
         lastDate: lastDate,
@@ -68,7 +72,9 @@ export default function TaskListScreen(props) {
       dispatch,
       listTaskModel,
       listStatus,
+      activeStatus,
       listUser,
+      listGroup,
       listInstance,
       firstDate,
       lastDate,
@@ -104,14 +110,6 @@ export default function TaskListScreen(props) {
 
   const createHandler = () => {
     props.history && props.history.push(`/task/${null}/edit`);
-  };
-
-  const objectId = (objects) => {
-    if (objects) {
-      const tempObjects = objects.map(({ _id }) => _id);
-      return tempObjects;
-    }
-    return [];
   };
 
   const tasksHeadCells = [
@@ -169,17 +167,7 @@ export default function TaskListScreen(props) {
         </div>
       ),
     },
-    {
-      field: "endDate",
-      headerName: "End Date",
-      flex: 0.7,
-      headerClassName: "headeritem",
-      renderCell: (params) => (
-        <div className="row">
-          <p>{moment(params.value).locale("fr").format("DD/MM/YY")}</p>
-        </div>
-      ),
-    },
+
     {
       field: "dedline",
       headerName: "Dedline",
@@ -195,11 +183,21 @@ export default function TaskListScreen(props) {
     {
       field: "status",
       headerName: "Status",
-      flex: 1,
+      flex: 0.7,
       type: "string",
       headerClassName: "headeritem",
       renderCell: (params) => (
         <div className="cellItems">{params.row?.status?.name}</div>
+      ),
+    },
+    {
+      field: "responsibleGroup",
+      headerName: "Responsible Group",
+      flex: 1.3,
+      type: "string",
+      headerClassName: "headeritem",
+      renderCell: (params) => (
+        <div className="cellItems">{params.row?.responsibleGroup?.name}</div>
       ),
     },
     {
@@ -229,6 +227,8 @@ export default function TaskListScreen(props) {
         setListInstance={setListInstance}
         listUser={listUser}
         setListUsers={setListUsers}
+        listGroup={listGroup}
+        setListGroups={setListGroups}
         firstDate={firstDate}
         setFirstDate={setFirstDate}
         lastDate={lastDate}

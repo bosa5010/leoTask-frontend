@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "proxy": "https://leotask-backend.onrender.com",
+  "proxy": "http://localhost:5000",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -45,12 +45,12 @@
     "styled-components": "^5.3.10",
     "to-words": "^2.5.0",
     "web-vitals": "^1.1.2",
-    "xlsx": "^0.17.1",
+    "xlsx": "^0.17.5",
     "yup": "^0.32.9"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
