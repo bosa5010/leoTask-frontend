@@ -1006,10 +1006,7 @@ export default function SubTaskEditScreen(props) {
                             closeMenuOnSelect={true}
                             instruction={onChangeEndWeek}
                             isDisabled={
-                              task &&
-                              task.status.number !== 2 &&
-                              task.responsibleUser &&
-                              task.responsibleUser._id !== userInfo._id
+                              task?.status?.number !== 2 || !userInfo?.isAdmin
                             }
                             onInputChange={(e) => {
                               handleInputChangeEndDate(e, listWeeks);
@@ -1052,6 +1049,7 @@ export default function SubTaskEditScreen(props) {
                             )}
                             label={"Dedline"}
                             name={"dedline"}
+                            disabled={task?.status?.number !== 2 || !userInfo?.isAdmin}
                             required={true}
                             instruction={onChangeStartDate}
                           />
