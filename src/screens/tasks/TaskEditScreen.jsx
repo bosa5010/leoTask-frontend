@@ -90,10 +90,16 @@ const FORM_VALIDATION = Yup.object().shape({
   responsibleTeams: Yup.array().required("Please Choose Responsible Teams"),
 });
 
-function lastweek() {
-  var lastweek = moment().startOf("week").format("YYYY-MM-DD");
+// function lastweek() {
+//   var lastweek = moment().startOf("week").format("YYYY-MM-DD");
 
-  return lastweek;
+//   return lastweek;
+// }
+
+function lastweek() {
+  const now = new Date();
+
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
 }
 
 export default function TaskEditScreen(props) {
