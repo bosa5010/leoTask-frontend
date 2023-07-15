@@ -43,7 +43,7 @@ const SideBar = ({ props }) => {
           pageNumber: 1,
           pageSize: 50,
           teams:
-            userInfo?.managedTeams.length > 0
+            userInfo?.managedTeams?.length > 0
               ? objectId(userInfo?.managedTeams)
               : userInfo?.team?._id,
         })
@@ -127,28 +127,26 @@ const SideBar = ({ props }) => {
             </Link>
           </MenuItem>
 
-          {taskThemes &&
-            taskThemes.map((taskTheme, index) => (
-              <SubMenu
-                title={taskTheme.name}
-                icon={<FaTasks size={iconSize} />}
-                key={index}
-              >
-                {taskModels &&
-                  taskModels.map(
-                    (taskModel, index) =>
-                      taskModel.taskTheme._id === taskTheme._id && (
-                        <MenuItem key={index}>
-                          <Link
-                            to={`/tasks/${taskModel._id}/${taskModel.name}/list`}
-                          >
-                            {taskModel.name}
-                          </Link>
-                        </MenuItem>
-                      )
-                  )}
-              </SubMenu>
-            ))}
+          {taskThemes?.map((taskTheme, index) => (
+            <SubMenu
+              title={taskTheme.name}
+              icon={<FaTasks size={iconSize} />}
+              key={index}
+            >
+              {taskModels?.map(
+                (taskModel, index) =>
+                  taskModel.taskTheme._id === taskTheme._id && (
+                    <MenuItem key={index}>
+                      <Link
+                        to={`/tasks/${taskModel._id}/${taskModel.name}/list`}
+                      >
+                        {taskModel.name}
+                      </Link>
+                    </MenuItem>
+                  )
+              )}
+            </SubMenu>
+          ))}
         </Menu>
         <Menu iconShape="circle">
           {userInfo?.isAdmin && (
