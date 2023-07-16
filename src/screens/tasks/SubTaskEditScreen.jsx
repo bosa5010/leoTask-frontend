@@ -361,13 +361,19 @@ export default function SubTaskEditScreen(props) {
   };
 
   const createHandler = (values) => {
-    if (values["status"].number === 2) {
+    if (
+      task?.responsibleUser?._id === userInfo?._id &&
+      task?.status.number === 2
+    ) {
       dispatch(createSubTask({ task: taskId, ...values }));
     }
   };
 
   const updateHandler = (values) => {
-    if (values["status"].number === 2) {
+    if (
+      task?.responsibleUser?._id === userInfo?._id &&
+      task?.status.number === 2
+    ) {
       dispatch(updateSubTask(values));
       setEditSubTask("ADD SUBTASK");
     }
@@ -394,7 +400,10 @@ export default function SubTaskEditScreen(props) {
   };
 
   const selectExcelFile = (values, label, setFieldValue, resetForm, item) => {
-    if (values["status"].number === 2) {
+    if (
+      task?.responsibleUser?._id === userInfo?._id &&
+      task?.status.number === 2
+    ) {
       setOpenModel(true);
       setConfirmData(false);
     }
@@ -407,7 +416,10 @@ export default function SubTaskEditScreen(props) {
     resetForm,
     item
   ) => {
-    if (values["status"].number === 2) {
+    if (
+      task?.responsibleUser?._id === userInfo?._id &&
+      task?.status.number === 2
+    ) {
       setFieldValue("data", data);
       setOpenModel(false);
       setConfirmData(true);
@@ -415,7 +427,10 @@ export default function SubTaskEditScreen(props) {
   };
 
   const uploadHandler = (setFieldValue, resetForm, values, item) => {
-    if (values["status"].number === 2) {
+    if (
+      task?.responsibleUser?._id === userInfo?._id &&
+      task?.status.number === 2
+    ) {
       createHandler(values);
       setData("");
       setConfirmData(false);
@@ -546,13 +561,11 @@ export default function SubTaskEditScreen(props) {
 
   const previousStepHandler = (values, label) => {
     if (
-      task.responsibleUser &&
-      task.responsibleUser._id === userInfo._id &&
-      task.status.number === 2 &&
+      task?.responsibleUser?._id === userInfo?._id &&
+      task?.status.number === 2 &&
       editSubTask !== "UPDATE SUBTASK" &&
-      task &&
-      task.taskModel.steps &&
-      task.currentStep.number > task.taskModel.steps[0].number
+      task?.taskModel?.steps &&
+      task?.currentStep.number > task.taskModel.steps[0].number
     ) {
       const index = task.taskModel.steps.findIndex((object) => {
         return object._id === task.currentStep._id;
@@ -1006,7 +1019,7 @@ export default function SubTaskEditScreen(props) {
                             closeMenuOnSelect={true}
                             instruction={onChangeEndWeek}
                             isDisabled={
-                              task?.status?.number !== 2 || !userInfo?.isAdmin
+                              task?.status.number !== 2 || !userInfo.isAdmin
                             }
                             onInputChange={(e) => {
                               handleInputChangeEndDate(e, listWeeks);
@@ -1049,8 +1062,10 @@ export default function SubTaskEditScreen(props) {
                             )}
                             label={"Dedline"}
                             name={"dedline"}
-                            disabled={task?.status?.number !== 2 || !userInfo?.isAdmin}
                             required={true}
+                            disabled={
+                              task?.status.number !== 2 || !userInfo.isAdmin
+                            }
                             instruction={onChangeStartDate}
                           />
                         </Grid>
@@ -1225,7 +1240,12 @@ export default function SubTaskEditScreen(props) {
                         </Grid>
 
                         <Grid item xs={10}>
-                          <Button disabled={task && task.status.number !== 2}>
+                          <Button
+                            disabled={
+                              task?.responsibleUser?._id !== userInfo?._id ||
+                              task?.status.number !== 2
+                            }
+                          >
                             {editSubTask}
                           </Button>
                         </Grid>
@@ -1233,7 +1253,10 @@ export default function SubTaskEditScreen(props) {
                         <Grid item xs={2}>
                           <FormButton
                             onPress={() => setOpen(Boolean(true))}
-                            disabled={task && task.status.number !== 2}
+                            disabled={
+                              task?.responsibleUser?._id !== userInfo?._id ||
+                              task?.status.number !== 2
+                            }
                           >
                             Referech
                           </FormButton>
@@ -1323,32 +1346,35 @@ export default function SubTaskEditScreen(props) {
                                     "ddd DD-MM-yyyy hh:mm:ss"
                                   )}
                                 </div>
-                                {subTask.taskStep !== null && (
-                                  <div className="row">
-                                    <AppFormButton
-                                      onPress={updateSubtask}
-                                      item={subTask}
-                                      rightIcon={
-                                        <MdOutlineUpdate
-                                          className={"updateIcon"}
-                                        />
-                                      }
-                                    />
-                                    <AppFormButton
-                                      style={{
-                                        color: "white",
-                                        fontSize: "2.5rem",
-                                      }}
-                                      onPress={() => {
-                                        SetDeleteOpen(
-                                          subTask._id ? true : false
-                                        );
-                                        setSelectedSubTask(subTask._id);
-                                      }}
-                                      rightIcon={<AiFillDelete />}
-                                    />
-                                  </div>
-                                )}
+                                {subTask.taskStep !== null &&
+                                  task?.responsibleUser?._id ===
+                                    userInfo?._id &&
+                                  task?.status?.number === 2 && (
+                                    <div className="row">
+                                      <AppFormButton
+                                        onPress={updateSubtask}
+                                        item={subTask}
+                                        rightIcon={
+                                          <MdOutlineUpdate
+                                            className={"updateIcon"}
+                                          />
+                                        }
+                                      />
+                                      <AppFormButton
+                                        style={{
+                                          color: "white",
+                                          fontSize: "2.5rem",
+                                        }}
+                                        onPress={() => {
+                                          SetDeleteOpen(
+                                            subTask._id ? true : false
+                                          );
+                                          setSelectedSubTask(subTask._id);
+                                        }}
+                                        rightIcon={<AiFillDelete />}
+                                      />
+                                    </div>
+                                  )}
                               </div>
                             </div>
                             {subTask.taskStep ? (
